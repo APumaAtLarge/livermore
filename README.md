@@ -1,10 +1,10 @@
 # Livermore Market Monitor
 
-基于 Next.js、TypeScript、SCSS 和 `yahoo-finance2` 的全球市场行情页，展示伦敦金现、布伦特原油、纳斯达克 100 和标普 500 的现价与分时走势。
+基于 Next.js、TypeScript、SCSS 和 `yahoo-finance2` 的全球市场行情页，以表格展示伦敦金现、布伦特原油、纳斯达克 100 和标普 500 的现价及移动均价。
 
 ## 功能
 
-- M5 分时数据，以及由 M5 服务端聚合得到的 M10 数据
+- M5（最近 5 个交易日均价）与 M10（最近 10 个交易日均价）
 - 现价、涨跌额、涨跌幅、昨收和交易状态
 - 浏览器每 30 秒自动刷新，支持手动刷新与失败重试
 - Yahoo Finance 请求仅在 Node.js 服务端执行
@@ -139,15 +139,14 @@ containers:
 ## 行情接口
 
 ```http
-GET /api/markets?timeframe=5m
-GET /api/markets?timeframe=10m
+GET /api/markets
 ```
 
-接口运行在 Node.js Runtime。M10 并非 Yahoo Finance 原生 interval，而是将 M5 数据按两个周期聚合得到。
+接口运行在 Node.js Runtime。服务端取得日线收盘价，以最近 5、10 个有效交易日分别计算算术平均；交易进行中时，最新一个日线值使用现价更新。
 
 响应包含：
 
-- `markets`：四个市场的价格、涨跌和走势点位
+- `markets`：四个市场的现价、涨跌、M5 与 M10
 - `updatedAt`：本次服务端更新时间
 - `delayed`：延迟行情提示
 

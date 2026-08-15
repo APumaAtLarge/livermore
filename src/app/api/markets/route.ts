@@ -1,14 +1,10 @@
 import { getMarkets } from "@/lib/market-data";
-import type { Timeframe } from "@/lib/market-types";
 
 export const runtime = "nodejs";
 
-export async function GET(request: Request) {
-  const value = new URL(request.url).searchParams.get("timeframe");
-  const timeframe: Timeframe = value === "10m" ? "10m" : "5m";
-
+export async function GET() {
   try {
-    return Response.json(await getMarkets(timeframe), {
+    return Response.json(await getMarkets(), {
       headers: { "Cache-Control": "public, s-maxage=15, stale-while-revalidate=45" },
     });
   } catch (error) {

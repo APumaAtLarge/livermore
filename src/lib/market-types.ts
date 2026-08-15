@@ -1,10 +1,3 @@
-export type Timeframe = "5m" | "10m";
-
-export type PricePoint = {
-  time: string;
-  price: number;
-};
-
 export type MarketItem = {
   symbol: string;
   name: string;
@@ -17,7 +10,8 @@ export type MarketItem = {
   currency: string;
   exchange: string;
   marketState: string;
-  points: PricePoint[];
+  ma5: number;
+  ma10: number;
 };
 
 export type MarketResponse = {

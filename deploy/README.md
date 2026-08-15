@@ -5,7 +5,7 @@
 应用部署只需要提交以下两个文件：
 
 - `namespace.yaml`：创建独立的 `livermore` namespace。
-- `knative-service.yaml`：创建 Knative Service，定义镜像、端口、资源、就绪探针及 `min-scale: "1"`。
+- `knative-service.yaml`：创建 Knative Service，定义镜像、端口、安全上下文、资源、就绪探针及 `min-scale: "1"`。Knative 会根据 `containerPort` 自动注入保留变量 `PORT`，不要在 `env` 中重复声明。
 
 Registry 密码不应写入 Git。域名和 TLS 是集群级配置，也不应与应用清单绑定；根据部署环境单独配置。
 

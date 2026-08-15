@@ -85,11 +85,17 @@ spec:
     spec:
       containers:
         - image: REGISTRY/LIVERMORE:TAG
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
           ports:
             - containerPort: 3000
-          env:
-            - name: PORT
-              value: "3000"
           resources:
             requests:
               cpu: 100m
@@ -101,7 +107,7 @@ spec:
 
 `min-scale: "1"` 表示 Knative 始终尝试保留至少一个 Revision Pod。它能避免应用从零副本启动，但会持续占用一个 Pod 的基础资源。扩容仍由 Knative Pod Autoscaler 根据流量完成。
 
-部署前需要将示例中的镜像地址替换为实际镜像。容器必须监听 Knative 注入的 `PORT`，并监听所有网络接口，而非仅监听 `localhost`。
+部署前需要将示例中的镜像地址替换为实际镜像。Knative 会根据 `containerPort` 自动注入保留环境变量 `PORT`，清单不能自行声明它。容器必须读取该变量并监听所有网络接口，而非仅监听 `localhost`；本项目 Dockerfile 已满足这两项要求。
 
 ## 镜像构建流水线
 

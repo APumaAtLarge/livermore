@@ -1,0 +1,41 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: livermore
+  namespace: livermore
+  labels:
+    app.kubernetes.io/name: livermore
+    app.kubernetes.io/part-of: livermore-market-monitor
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/apumaatlarge/livermore:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http1
+              containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3000"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 6

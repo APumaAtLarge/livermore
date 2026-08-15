@@ -69,6 +69,8 @@ Kourier 负责入口路由和 Knative 流量转发，不是 CDN，也不会自�
 
 生产服务固定保留一个副本，以消除 scale-to-zero 带来的首请求冷启动：
 
+仓库已经提供可应用的 [`deploy/namespace.yaml`](deploy/namespace.yaml) 和 [`deploy/knative-service.yaml`](deploy/knative-service.yaml)。完整的 Kourier 检查、GHCR 私有镜像凭据、部署、无 DNS 测试和正式域名配置步骤见 [`deploy/README.md`](deploy/README.md)。
+
 ```yaml
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -100,6 +102,33 @@ spec:
 `min-scale: "1"` 表示 Knative 始终尝试保留至少一个 Revision Pod。它能避免应用从零副本启动，但会持续占用一个 Pod 的基础资源。扩容仍由 Knative Pod Autoscaler 根据流量完成。
 
 部署前需要将示例中的镜像地址替换为实际镜像。容器必须监听 Knative 注入的 `PORT`，并监听所有网络接口，而非仅监听 `localhost`。
+
+## 镜像构建流水线
+
+`.github/workflows/container-image.yml` 使用 GitHub Actions 和 Docker Buildx 构建镜像，并发布到 GitHub Container Registry：
+
+```text
+ghcr.io/<github-owner>/<repository>:latest
+ghcr.io/<github-owner>/<repository>:sha-<完整提交哈希>
+```
+
+流水线行为：
+
+- Pull Request：仅验证 Docker 镜像能否成功构建，不推送镜像。
+- 推送到默认分支：推送 `latest` 和不可变的完整提交 SHA 标签。
+- 推送 `v1.2.3` 形式的 Git 标签：额外推送 `1.2.3` 和 `1.2` 标签。
+- 使用 GitHub Actions 缓存加速依赖和镜像层，并生成 provenance 与 SBOM。
+
+GHCR 登录使用仓库自动提供的 `GITHUB_TOKEN`，不需要额外配置 Registry 密码。工作流已声明 `packages: write` 权限；如果组织策略限制 GitHub Actions 发布包，还需要在仓库或组织设置中允许 Actions 读写 Packages。
+
+生产环境建议在 Knative Service 中使用提交 SHA 标签，而不是 `latest`：
+
+```yaml
+containers:
+  - image: ghcr.io/<github-owner>/<repository>:sha-<完整提交哈希>
+```
+
+这样每次发布指向不可变镜像，便于回滚和审计。首次发布后，还需要在 GHCR Package 设置中确认镜像的可见性，或给 K3s 配置读取私有 GHCR 镜像的 `imagePullSecret`。
 
 ## 行情接口
 

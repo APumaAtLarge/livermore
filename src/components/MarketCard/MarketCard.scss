@@ -1,0 +1,27 @@
+.market-card {
+  min-width: 0; padding: 26px 28px 22px; background: rgba(255,255,255,.58);
+  border: 1px solid rgba(18,26,24,.14); border-radius: 3px; position: relative; overflow: hidden;
+  transition: transform .25s ease, box-shadow .25s ease;
+  &:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(25,36,32,.08); }
+  &::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: #b99a57; }
+  &--energy::before { background: #9a5b3e; }
+  &--index::before { background: var(--green); }
+
+  &__header { display: flex; align-items: flex-start; gap: 13px; }
+  &__index { font: 500 10px/1 var(--font-geist-mono); color: #9aa19e; padding-top: 5px; }
+  h2 { font: 600 18px/1.3 var(--font-geist-sans); letter-spacing: -.02em; }
+  p { color: var(--muted); font: 10px/1.6 var(--font-geist-mono); text-transform: uppercase; letter-spacing: .06em; }
+  &__status { margin-left: auto; white-space: nowrap; color: #8b918f; font-size: 10px; padding: 5px 8px; border: 1px solid #d6d8d3; border-radius: 20px; }
+  &__status.is-open { color: var(--green); border-color: #a9c6bc; &::before { content: ""; display: inline-block; width: 5px; height: 5px; margin-right: 5px; border-radius: 50%; background: #29815f; } }
+
+  &__quote { display: flex; align-items: flex-end; justify-content: space-between; margin: 30px 0 13px; }
+  &__quote > div:first-child { display: flex; align-items: flex-start; gap: 7px; }
+  &__currency { color: var(--muted); font: 9px/1 var(--font-geist-mono); margin-top: 8px; }
+  strong { font: 500 clamp(30px,3.2vw,43px)/1 var(--font-geist-mono); letter-spacing: -.065em; }
+  &__change { display: grid; gap: 4px; justify-items: end; font: 11px/1 var(--font-geist-mono); b { font-weight: 600; padding: 6px 8px; border-radius: 2px; } }
+  .is-up { color: var(--green); b { background: #dceae3; } }
+  .is-down { color: var(--red); b { background: #f1dfdb; } }
+  &__footer { display: flex; justify-content: space-between; gap: 16px; padding-top: 15px; border-top: 1px solid #dadbd6; color: var(--muted); font: 9px/1.2 var(--font-geist-mono); text-transform: uppercase; b { color: var(--ink); font-weight: 500; } }
+}
+
+@media (max-width: 600px) { .market-card { padding: 22px 20px 18px; } }
